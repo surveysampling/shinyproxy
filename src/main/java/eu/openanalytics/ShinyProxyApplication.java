@@ -51,50 +51,50 @@ import io.undertow.servlet.api.DeploymentInfo;
 @Configuration
 public class ShinyProxyApplication {
 
-	@Inject
-	DockerService dockerService;
+        @Inject
+        DockerService dockerService;
 
-	@Inject
-	Environment environment;
+        @Inject
+        Environment environment;
 
-	public static void main(String[] args) {
-		SpringApplication app = new SpringApplication(ShinyProxyApplication.class);
-		
-		boolean hasExternalConfig = Files.exists(Paths.get("application.yml"));
-		if (!hasExternalConfig) app.setAdditionalProfiles("demo");
-		
-		app.run(args);
-	}
+        public static void main(String[] args) {
+                SpringApplication app = new SpringApplication(ShinyProxyApplication.class);
 
-	@Bean
-	public EmbeddedServletContainerFactory servletContainer() {
-		UndertowEmbeddedServletContainerFactory factory = new UndertowEmbeddedServletContainerFactory();
-		factory.addDeploymentInfoCustomizers(new UndertowDeploymentInfoCustomizer() {
-			@Override
-			public void customize(DeploymentInfo deploymentInfo) {
-				deploymentInfo.addInitialHandlerChainWrapper(new RootHandlerWrapper());
-			}
-		});
-		factory.setPort(Integer.parseInt(environment.getProperty("shiny.proxy.port", "8080")));
-		return factory;	
-	}
+                boolean hasExternalConfig = Files.exists(Paths.get("/etc/shinyproxy/application.yml"));
+                if (!hasExternalConfig) app.setAdditionalProfiles("demo");
 
-	private class RootHandlerWrapper implements HandlerWrapper {
-		public HttpHandler wrap(HttpHandler defaultHandler) {
-			PathHandler pathHandler = Handlers.path(defaultHandler);
-			dockerService.addMappingListener(new MappingListener() {
-				@Override
-				public void mappingAdded(String mapping, URI target) {
-					ProxyClient proxyClient = new SimpleProxyClientProvider(target);
-					HttpHandler handler = new ProxyHandler(proxyClient, ResponseCodeHandler.HANDLE_404);
-					pathHandler.addPrefixPath(mapping, handler);
-				}
-				@Override
-				public void mappingRemoved(String mapping) {
-					pathHandler.removePrefixPath(mapping);
-				}
-			});
-			return pathHandler;
-		}
-	}
+                app.run(args);
+        }
+
+        @Bean
+        public EmbeddedServletContainerFactory servletContainer() {
+                UndertowEmbeddedServletContainerFactory factory = new UndertowEmbeddedServletContainerFactory();
+                factory.addDeploymentInfoCustomizers(new UndertowDeploymentInfoCustomizer() {
+                        @Override
+                        public void customize(DeploymentInfo deploymentInfo) {
+                                deploymentInfo.addInitialHandlerChainWrapper(new RootHandlerWrapper());
+                        }
+                });
+                factory.setPort(Integer.parseInt(environment.getProperty("shiny.proxy.port", "8080")));
+                return factory;
+        }
+
+        private class RootHandlerWrapper implements HandlerWrapper {
+                public HttpHandler wrap(HttpHandler defaultHandler) {
+                        PathHandler pathHandler = Handlers.path(defaultHandler);
+                        dockerService.addMappingListener(new MappingListener() {
+                                @Override
+                                public void mappingAdded(String mapping, URI target) {
+                                        ProxyClient proxyClient = new SimpleProxyClientProvider(target);
+                                        HttpHandler handler = new ProxyHandler(proxyClient, ResponseCodeHandler.HANDLE_404);
+                                        pathHandler.addPrefixPath(mapping, handler);
+                                }
+                                @Override
+                                public void mappingRemoved(String mapping) {
+                                        pathHandler.removePrefixPath(mapping);
+                                }
+                        });
+                        return pathHandler;
+                }
+        }
 }
