@@ -2,4 +2,4 @@ version: '2'
 services:
   shinyproxy_base:
     image: surveysampling/shiny-base
-
+    command: touch /tmp
