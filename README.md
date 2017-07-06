@@ -1,5 +1,3 @@
-This is forked from openanalytics/shinyproxy
-
 <pre>
                _____ _     _             _____
               / ____| |   (_)           |  __ \
@@ -12,6 +10,20 @@ This is forked from openanalytics/shinyproxy
 
 </pre>
 
+surveysampling/shinyproxy
+-------------------------
+This project was forked from openanalytics/shinyproxy at the 0.9.2 release and
+might be periodically updated to suit our needs. Everything is happening in the
+`ssi-custom` branch, to retain the ability to merge upstream features/fixes.
+
+## Change Log
+ * Use a config file at `/home/appuser/shinyproxy/application.yml` (added absolute path)
+
+## Deployment via Docker-Pull-Run
+Some extra files were added to allow ShinyProxy to be deployed via Docker-Pull-Run.
+
+
+<!-- Original README.md continues below -->
 # ShinyProxy
 
 Middleware to Deploy Shiny Applications in an Enterprise Context
