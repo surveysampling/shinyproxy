@@ -60,7 +60,7 @@ public class ShinyProxyApplication {
         public static void main(String[] args) {
                 SpringApplication app = new SpringApplication(ShinyProxyApplication.class);
 
-                boolean hasExternalConfig = Files.exists(Paths.get("/etc/shinyproxy/application.yml"));
+                boolean hasExternalConfig = Files.exists(Paths.get("/home/appuser/shinyproxy/application.yml"));
                 if (!hasExternalConfig) app.setAdditionalProfiles("demo");
 
                 app.run(args);
